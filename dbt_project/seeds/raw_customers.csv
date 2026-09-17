@@ -1,0 +1,11 @@
+customer_id,first_name,last_name,email
+1,Maria,Ivanova,maria.ivanova@example.com
+2,Ivan,Petrov,ivan.petrov@example.com
+3,Olga,Smirnova,olga.smirnova@example.com
+4,Dmitry,Kuznetsov,dmitry.kuznetsov@example.com
+5,Anna,Sokolova,anna.sokolova@example.com
+6,Sergey,Popov,sergey.popov@example.com
+7,Elena,Lebedeva,elena.lebedeva@example.com
+8,Pavel,Kozlov,pavel.kozlov@example.com
+9,Natalia,Novikova,natalia.novikova@example.com
+10,Andrey,Morozov,andrey.morozov@example.com

@@ -1,0 +1,45 @@
+name: 'dbt_demo'
+version: '1.0.0'
+config-version: 2
+
+profile: 'dbt_demo'
+
+model-paths: ["models"]
+analysis-paths: ["analyses"]
+test-paths: ["tests"]
+seed-paths: ["seeds"]
+macro-paths: ["macros"]
+snapshot-paths: ["snapshots"]
+
+clean-targets:
+  - "target"
+  - "dbt_packages"
+
+vars:
+  # Здесь можно переопределять параметры для заданий, не трогая сам SQL.
+  events_start_date: '2024-01-01'
+
+seeds:
+  dbt_demo:
+    +schema: seeds
+    raw_customers:
+      +column_types:
+        customer_id: integer
+    raw_orders:
+      +column_types:
+        order_id: integer
+        customer_id: integer
+    raw_payments:
+      +column_types:
+        payment_id: integer
+        order_id: integer
+        amount: integer
+
+models:
+  dbt_demo:
+    staging:
+      +materialized: view
+      +schema: staging
+    marts:
+      +materialized: table
+      +schema: marts

@@ -1,0 +1,58 @@
+name: dbt CI
+
+on:
+  pull_request:
+    paths:
+      - "dbt_project/**"
+      - ".github/workflows/dbt_ci.yml"
+
+jobs:
+  dbt-build:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: dbt_user
+          POSTGRES_PASSWORD: dbt_password
+          POSTGRES_DB: dbt_demo
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U dbt_user -d dbt_demo"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+    env:
+      POSTGRES_USER: dbt_user
+      POSTGRES_PASSWORD: dbt_password
+      POSTGRES_DB: dbt_demo
+      DBT_PROFILES_DIR: ${{ github.workspace }}/dbt_project/profiles
+      # По умолчанию profiles.yml резолвит `host: postgres` — это работает
+      # только внутри сети docker-compose. На раннере GitHub Actions
+      # сервис-контейнер Postgres доступен по localhost.
+      DBT_HOST: localhost
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dbt
+        run: pip install dbt-core dbt-postgres
+
+      - name: dbt deps
+        working-directory: dbt_project
+        run: dbt deps
+
+      - name: dbt debug
+        working-directory: dbt_project
+        run: dbt debug --target ci
+
+      - name: dbt build (seed + run + test + snapshot)
+        working-directory: dbt_project
+        run: dbt build --target ci

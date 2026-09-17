@@ -1,0 +1,26 @@
+version: 2
+
+models:
+  - name: fct_events
+    description: >
+      Incremental-модель поверх `stg_events`. При каждом запуске
+      (пере)обрабатываются только строки с `loaded_at`, более свежим, чем
+      уже есть в таблице.
+    columns:
+      - name: event_id
+        data_tests:
+          - unique
+          - not_null
+      - name: customer_id
+        data_tests:
+          - not_null
+          - relationships:
+              to: ref('stg_customers')
+              field: customer_id
+      - name: event_type
+        data_tests:
+          - accepted_values:
+              values:
+                - page_view
+                - add_to_cart
+                - checkout

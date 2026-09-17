@@ -1,0 +1,37 @@
+# Монтируется в контейнер dbt как /root/.dbt/profiles.yml
+# Учётные данные приходят из переменных окружения, заданных в docker-compose.yml / .env
+dbt_demo:
+  target: dev
+  outputs:
+    dev:
+      type: postgres
+      host: postgres
+      user: "{{ env_var('POSTGRES_USER') }}"
+      password: "{{ env_var('POSTGRES_PASSWORD') }}"
+      port: 5432
+      dbname: "{{ env_var('POSTGRES_DB') }}"
+      schema: dbt_dev
+      threads: 4
+
+    prod:
+      type: postgres
+      host: postgres
+      user: "{{ env_var('POSTGRES_USER') }}"
+      password: "{{ env_var('POSTGRES_PASSWORD') }}"
+      port: 5432
+      dbname: "{{ env_var('POSTGRES_DB') }}"
+      schema: dbt_prod
+      threads: 4
+
+    # Используется в .github/workflows/dbt_ci.yml, где Postgres запускается
+    # как сервис-контейнер GitHub Actions и доступен по localhost, а не по
+    # имени сервиса docker-compose "postgres".
+    ci:
+      type: postgres
+      host: "{{ env_var('DBT_HOST', 'postgres') }}"
+      user: "{{ env_var('POSTGRES_USER') }}"
+      password: "{{ env_var('POSTGRES_PASSWORD') }}"
+      port: 5432
+      dbname: "{{ env_var('POSTGRES_DB') }}"
+      schema: dbt_ci
+      threads: 4

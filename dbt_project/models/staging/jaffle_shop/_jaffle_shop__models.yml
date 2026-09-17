@@ -1,0 +1,68 @@
+version: 2
+
+models:
+  - name: stg_customers
+    description: Одна строка на клиента, очищенная от seed-данных.
+    columns:
+      - name: customer_id
+        description: Первичный ключ клиента.
+        data_tests:
+          - unique
+          - not_null
+      - name: email
+        description: Email клиента.
+        data_tests:
+          - not_null
+
+  - name: stg_orders
+    description: Одна строка на заказ, оформленный клиентом.
+    columns:
+      - name: order_id
+        description: Первичный ключ заказа.
+        data_tests:
+          - unique
+          - not_null
+      - name: customer_id
+        description: Внешний ключ на {{ doc("stg_customers") }}.
+        data_tests:
+          - not_null
+          - relationships:
+              to: ref('stg_customers')
+              field: customer_id
+      - name: status
+        description: Текущий статус заказа.
+        data_tests:
+          - accepted_values:
+              values:
+                - placed
+                - shipped
+                - completed
+                - return_pending
+                - returned
+
+  - name: stg_payments
+    description: Одна строка на платёж по заказу. У одного заказа может быть несколько платежей.
+    columns:
+      - name: payment_id
+        description: Первичный ключ платежа.
+        data_tests:
+          - unique
+          - not_null
+      - name: order_id
+        description: Внешний ключ на {{ doc("stg_orders") }}.
+        data_tests:
+          - not_null
+          - relationships:
+              to: ref('stg_orders')
+              field: order_id
+      - name: payment_method
+        description: Способ оплаты.
+        data_tests:
+          - accepted_values:
+              values:
+                - credit_card
+                - coupon
+                - bank_transfer
+                - gift_card
+      - name: amount
+        description: Сумма платежа в долларах.

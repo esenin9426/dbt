@@ -1,0 +1,42 @@
+version: 2
+
+models:
+  - name: fct_orders
+    description: Одна строка на заказ, обогащённая разбивкой платежей по способу оплаты.
+    columns:
+      - name: order_id
+        data_tests:
+          - unique
+          - not_null
+      - name: amount
+        description: Итоговая сумма, оплаченная за заказ, в долларах.
+        data_tests:
+          - not_null
+          - non_negative # кастомный generic-тест, см. dbt_project/tests/generic
+
+  - name: dim_customers
+    description: Одна строка на клиента с агрегатами по заказам (lifetime value, количество заказов).
+    columns:
+      - name: customer_id
+        data_tests:
+          - unique
+          - not_null
+      - name: lifetime_value
+        description: Сумма `amount` по всем заказам клиента.
+
+exposures:
+  - name: customer_lifetime_value_dashboard
+    label: Дашборд Customer Lifetime Value
+    type: dashboard
+    maturity: medium
+    url: https://bi.example.com/dashboards/clv
+    description: >
+      Пример exposure (см. guide/13-advanced-topics). Показывает, что
+      нижестоящий BI-дашборд зависит от dim_customers, поэтому `dbt run
+      --select +exposure:customer_lifetime_value_dashboard` собирает ровно
+      то, что нужно этому дашборду.
+    depends_on:
+      - ref('dim_customers')
+    owner:
+      name: Data Team
+      email: data-team@example.com
