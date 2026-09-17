@@ -15,7 +15,7 @@
 ## Быстрый старт
 
 ```bash
-git clone <этот репозиторий>
+git clone https://github.com/esenin9426/dbt.git
 cd dbt
 cp .env.example .env
 make up              # docker compose up -d --build: Postgres + dbt + Adminer
